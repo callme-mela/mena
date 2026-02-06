@@ -1,0 +1,271 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>A Question for You...</title>
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Google Fonts -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Poppins:wght@300;400;600&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- Canvas Confetti -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+    <style>
+      body {
+        font-family: "Poppins", sans-serif;
+        overflow: hidden;
+      }
+
+      .script-font {
+        font-family: "Great Vibes", cursive;
+      }
+
+      /* Floating Hearts */
+      .floating-heart {
+        position: absolute;
+        color: rgba(167, 139, 250, 0.6); /* lavender */
+        animation: float 15s infinite linear;
+        z-index: 0;
+        pointer-events: none;
+      }
+
+      @keyframes float {
+        0% {
+          transform: translateY(100vh) rotate(0deg);
+          opacity: 1;
+        }
+        100% {
+          transform: translateY(-10vh) rotate(360deg);
+          opacity: 0;
+        }
+      }
+
+      .fade-in {
+        animation: fadeIn 1.5s ease-in forwards;
+      }
+
+      .fade-out {
+        animation: fadeOut 1s ease-out forwards;
+      }
+
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(20px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      @keyframes fadeOut {
+        from {
+          opacity: 1;
+          transform: translateY(0);
+        }
+        to {
+          opacity: 0;
+          transform: translateY(-20px);
+        }
+      }
+
+      .heartbeat {
+        animation: beat 1.2s infinite;
+      }
+
+      @keyframes beat {
+        0%, 100% {
+          transform: scale(1);
+        }
+        25%, 75% {
+          transform: scale(1.1);
+        }
+        50% {
+          transform: scale(1);
+        }
+      }
+    </style>
+  </head>
+
+  <body
+    class="bg-gradient-to-br from-white via-purple-50 to-purple-200 h-screen w-screen flex flex-col items-center justify-center relative select-none"
+  >
+    <div id="hearts-container" class="absolute inset-0 overflow-hidden"></div>
+
+    <!-- INTRO -->
+    <div
+      id="intro-card"
+      class="z-10 text-center max-w-lg p-8 bg-white/90 backdrop-blur-sm rounded-3xl shadow-xl border border-purple-200 transition-all duration-700"
+    >
+      <h1 class="text-3xl text-purple-700 mb-6 font-semibold" id="intro-text">
+        Hey Choco Mami...
+      </h1>
+
+      <p class="text-gray-600 mb-8 hidden" id="intro-sub">
+        I have something important to ask you.
+      </p>
+
+      <button
+        onclick="nextStep()"
+        class="bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 px-8 rounded-full shadow-lg transform transition hover:scale-105 focus:outline-none ring-4 ring-purple-300"
+      >
+        Click Me
+      </button>
+    </div>
+
+    <!-- QUESTION -->
+    <div
+      id="question-card"
+      class="hidden z-10 text-center max-w-2xl p-6 md:p-12 relative"
+    >
+      <div class="text-6xl md:text-8xl text-purple-600 mb-4 heartbeat">
+        💜
+      </div>
+
+      <h1
+        class="script-font text-5xl md:text-7xl text-purple-700 mb-4"
+      >
+        Will you be my Valentine?
+      </h1>
+
+      <p class="text-gray-600 mb-10 text-lg md:text-xl">
+        (I promise to buy you your favourite cake 🎂)
+      </p>
+
+      <div class="flex justify-center gap-4 md:gap-8 items-center h-20">
+        <button
+          id="yes-btn"
+          onclick="acceptProposal()"
+          class="bg-purple-600 hover:bg-purple-700 text-white text-xl font-bold py-4 px-10 rounded-full shadow-lg transform transition hover:scale-110 ring-4 ring-purple-300 z-20"
+        >
+          YES!
+        </button>
+
+        <button
+          id="no-btn"
+          onmouseover="dodgeButton()"
+          onclick="dodgeButton()"
+          class="bg-gray-400 text-white text-xl font-bold py-4 px-10 rounded-full shadow-lg transition"
+          style="transition: all 0.2s ease"
+        >
+          No
+        </button>
+      </div>
+    </div>
+
+    <!-- SUCCESS -->
+    <div
+      id="success-card"
+      class="hidden z-10 text-center max-w-2xl p-8 bg-white/95 backdrop-blur-md rounded-3xl shadow-2xl border-4 border-purple-300 fade-in"
+    >
+      <h1 class="text-6xl md:text-8xl mb-4">🥰🎉</h1>
+
+      <h2 class="script-font text-5xl md:text-7xl text-purple-700 mb-6">
+        She said YES!
+      </h2>
+
+      <p class="text-xl text-gray-700 font-medium">
+        You just made me the happiest person in the world. <br />
+        I love you! 💜
+      </p>
+
+      <div class="mt-8 text-sm text-gray-400">
+        Screenshot this and send it to me!
+      </div>
+    </div>
+
+    <script>
+      let step = 0;
+      const messages = [
+        "Hey Mami...",
+        "We've made so many memories...",
+        "You make me smile every single day...",
+        "So I have a question...",
+      ];
+
+      const introCard = document.getElementById("intro-card");
+      const introText = document.getElementById("intro-text");
+      const questionCard = document.getElementById("question-card");
+      const successCard = document.getElementById("success-card");
+      const noBtn = document.getElementById("no-btn");
+      const yesBtn = document.getElementById("yes-btn");
+
+      let yesScale = 1;
+
+      function nextStep() {
+        step++;
+        introText.classList.add("fade-out");
+
+        setTimeout(() => {
+          if (step < messages.length) {
+            introText.innerText = messages[step];
+            introText.classList.remove("fade-out");
+            introText.classList.add("fade-in");
+          } else {
+            introCard.classList.add("hidden");
+            questionCard.classList.remove("hidden");
+            questionCard.classList.add("fade-in");
+          }
+        }, 500);
+      }
+
+      function dodgeButton() {
+        yesScale += 0.2;
+        yesBtn.style.transform = `scale(${yesScale})`;
+
+        const maxX = window.innerWidth - noBtn.offsetWidth - 50;
+        const maxY = window.innerHeight - noBtn.offsetHeight - 50;
+
+        noBtn.style.position = "absolute";
+        noBtn.style.left = Math.random() * maxX + "px";
+        noBtn.style.top = Math.random() * maxY + "px";
+      }
+
+      function acceptProposal() {
+        questionCard.classList.add("hidden");
+        successCard.classList.remove("hidden");
+
+        launchConfetti();
+
+        let duration = 5000;
+        let end = Date.now() + duration;
+
+        let interval = setInterval(() => {
+          if (Date.now() > end) clearInterval(interval);
+          launchConfetti();
+        }, 300);
+      }
+
+      function launchConfetti() {
+        confetti({
+          particleCount: 150,
+          spread: 100,
+          origin: { y: 0.6 },
+          colors: ["#7c3aed", "#a78bfa", "#ffffff"],
+          shapes: ["heart"],
+        });
+      }
+
+      function createFloatingHeart() {
+        const heart = document.createElement("div");
+        heart.classList.add("floating-heart");
+        heart.innerHTML = "💜";
+        heart.style.left = Math.random() * 100 + "vw";
+        heart.style.fontSize = Math.random() * 20 + 10 + "px";
+        heart.style.animationDuration = Math.random() * 10 + 10 + "s";
+        document.getElementById("hearts-container").appendChild(heart);
+        setTimeout(() => heart.remove(), 20000);
+      }
+
+      setInterval(createFloatingHeart, 500);
+    </script>
+  </body>
+</html>
